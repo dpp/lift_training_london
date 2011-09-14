@@ -1,4 +1,5 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="description" content="" />
@@ -14,6 +15,10 @@
   display: block;
   color: red;
 }
+.lift_error {
+    color: purple;
+}
+
 
 .sidebar ul {
 	margin:0;
@@ -65,7 +70,7 @@
 
 	<span class="lift:Menu.builder"></span>
 
-        <div class="lift:Msgs?showAll=true"></div>
+        <div class="lift:Msgs"></div>
         <hr class="space" />
       </div>
 
@@ -79,7 +84,10 @@
           <a href="http://www.liftweb.net"><i>Lift</i></a> 
 	  is Copyright 2007-2010 WorldWide Conferencing, LLC.
 	  Distributed under an Apache 2.0 License.</h4>
+          <div class="lift:menu.group?group=bottom">menus</div>
+
       </div>
+
     </div>
   </body>
 </html>

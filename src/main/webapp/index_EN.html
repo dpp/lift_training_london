@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <title>Home</title>
+
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title class="lift:Menu.title">App: </title>
+    <style class="lift:CSS.blueprint"></style>
+    <style class="lift:CSS.fancyType"></style>
+    <script id="jquery" src="/classpath/jquery.js" type="text/javascript"></script>
+    <script id="json" src="/classpath/json.js" type="text/javascript"></script>
+    <style type="text/css">
+/* <![CDATA[ */
+.edit_error_class {
+  display: block;
+  color: red;
+}
+
+.sidebar ul {
+	margin:0;
+	padding:0;
+	border-bottom:1px solid #ccc;
+}
+
+
+.sidebar ul li {
+	margin:0;
+	padding:0;
+	list-style:none;
+	border:1px solid #ccc;
+	border-bottom:none;
+}
+
+.sidebar ul li a {
+	display:block;
+	padding:3px;
+	text-indent:30px;
+	text-decoration:none;
+}
+
+.sidebar ul li span {
+	display:block;
+	padding:3px;
+	text-indent:30px;
+	text-decoration:none;
+}
+
+.sidebar ul li a:hover {
+	background-color: #eee;
+}
+
+
+  /* ]]> */
+  </style>
+  </head>
+  <body class="lift:content_id=main">
+  <h1>dude... this will not be rendered</h1>
+    <div id="main" class="foo bar" lift="surround?with=default;at=content">
+
+      <h2>Welcome to your project!</h2>
+        <h1>Thanks for joining me!</h1>
+        This is the English template
+      <p>
+
+	<span class="lift:HelloWorld.howdy">
+	  Welcome to your Lift app at <span id="time">Time goes here</span>
+	</span>
+
+          This is the <span class="lift:ShowWhat">huh?</span> page.
+
+          <span lift="JaxA">na</span>
+          <div id="ajax_answer">Answers from Ajax here</div>
+      </p>
+        <div lift="with-param?name=foo">this is my footer</div>
+    </div>
+  </body>
+</html>
+

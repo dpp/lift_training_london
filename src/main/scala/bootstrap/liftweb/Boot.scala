@@ -2,6 +2,7 @@ package bootstrap.liftweb
 
 import net.liftweb._
 import util._
+import json._
 import Helpers._
 
 import common._
@@ -11,6 +12,7 @@ import Loc._
 import mapper._
 
 import code.model._
+import xml.NodeSeq
 
 
 /**
@@ -26,7 +28,7 @@ class Boot {
 			     "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE",
 			     Props.get("db.user"), Props.get("db.password"))
 
-      LiftRules.unloadHooks.append(vendor.closeAllConnections_! _)
+      LiftRules.unloadHooks.append(() => vendor.closeAllConnections_!())
 
       DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
     }
@@ -43,10 +45,28 @@ class Boot {
     def sitemap = SiteMap(
       Menu.i("Home") / "index" >> User.AddUserMenusAfter, // the simple way to declare a menu
 
+      Menu.i("Sometimes") / "sometimes" >> If(shouldDisplay _,
+                                              S ? "Can't view now"),
+
+    Menu.i("Form") / "form",
+
+      Menu.i("top") / "top" submenus(
+        Menu.i("About") / "about" >> Hidden >> LocGroup("bottom"),
+        Menu.i("Contact") / "contact"
+        ),
+
+      Menu.param[What]("What", "What", {
+        case "one" => Full(First)
+        case "two" => Full(Second)
+        case "both" => Full(Both)
+        case "who" => Full(Both)
+        case _ => Empty
+      }, w => w.showString) / "what" >> If(() => true, "huh") >>
+      Value(First),
+
       // more complex because this menu allows anything in the
       // /static path to be visible
-      Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
-	       "Static Content")))
+      Menu.i("Static") / "static" / **)
 
     def sitemapMutators = User.sitemapMutator
 
@@ -70,9 +90,68 @@ class Boot {
 
     // Use HTML5 for rendering
     LiftRules.htmlProperties.default.set((r: Req) =>
-      new Html5Properties(r.userAgent))    
+      new Html5Properties(r.userAgent))
+
+    LiftRules.dispatch.append{
+      case Req(List("foo"),_, _) => () => Full( JsonResponse(JsonAST.JString("foo")))
+    }
+
+    LiftRules.dispatch.append(RestExample)
 
     // Make a transaction span the whole HTTP request
     S.addAround(DB.buildLoanWrapper)
   }
+
+  def example: NodeSeq => NodeSeq = (for {
+    user <- User.currentUser
+  } yield ".name" #> user.firstName) openOr "*" #> "Not logged in"
+
+  def shouldDisplay: Boolean = Helpers.randomInt(10) > 5
+}
+
+sealed trait What {
+  def showString: String
+}
+case object First extends What {
+  def showString: String = "one"
+}
+case object Second extends What {
+  def showString: String = "two"
+}
+case object Both extends What  {
+  def showString: String = "both"
+}
+
+import net.liftweb.http.rest._
+
+object RestExample extends RestHelper {
+  serve {
+    case "bar" :: Nil JsonPost json -> _ =>
+      <a>foo</a>
+      /*
+      for {
+        item <- Item(json) ?~ "Cannot convert JSON to Item" ~> 401
+      } yield JInt(Item.save(item))
+*/
+    // case "bar" :: Item(item) :: Nil Get _ => item: JValue
+      
+    case "bar" :: id :: Nil Get _ => JsonAST.JString(id)
+  }
+
+}
+
+case class Item(id: String, name: String, qnty: Int)
+
+
+object Item {
+  private implicit val formats =
+  DefaultFormats
+
+  def save(in: Item): Int = 5 // FIXME save and return primary key
+  
+  // def apply(in: JValue): Box[Item] = Helpers.tryo(in.extract[Item])
+
+  // def unapply(str: String): Option[Item] = None // get from storage
+
+  implicit def itemToJson(item: Item): JValue = Extraction.decompose(item)
 }
