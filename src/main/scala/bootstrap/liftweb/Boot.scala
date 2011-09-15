@@ -92,11 +92,14 @@ class Boot {
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))
 
-    LiftRules.dispatch.append{
-      case Req(List("foo"),_, _) => () => Full( JsonResponse(JsonAST.JString("foo")))
-    }
+    LiftRules.dispatch.append(code.lib.FullRest)
 
-    LiftRules.dispatch.append(RestExample)
+    /*
+    LiftRules.dispatch.append {
+      case r if {println("Content type "+r.contentType+" json "+r.json+" body "+
+        (new String(r.body.open_!))); false} => null
+
+    }*/
 
     // Make a transaction span the whole HTTP request
     S.addAround(DB.buildLoanWrapper)
@@ -120,38 +123,4 @@ case object Second extends What {
 }
 case object Both extends What  {
   def showString: String = "both"
-}
-
-import net.liftweb.http.rest._
-
-object RestExample extends RestHelper {
-  serve {
-    case "bar" :: Nil JsonPost json -> _ =>
-      <a>foo</a>
-      /*
-      for {
-        item <- Item(json) ?~ "Cannot convert JSON to Item" ~> 401
-      } yield JInt(Item.save(item))
-*/
-    // case "bar" :: Item(item) :: Nil Get _ => item: JValue
-      
-    case "bar" :: id :: Nil Get _ => JsonAST.JString(id)
-  }
-
-}
-
-case class Item(id: String, name: String, qnty: Int)
-
-
-object Item {
-  private implicit val formats =
-  DefaultFormats
-
-  def save(in: Item): Int = 5 // FIXME save and return primary key
-  
-  // def apply(in: JValue): Box[Item] = Helpers.tryo(in.extract[Item])
-
-  // def unapply(str: String): Option[Item] = None // get from storage
-
-  implicit def itemToJson(item: Item): JValue = Extraction.decompose(item)
 }
