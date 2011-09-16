@@ -13,6 +13,7 @@ import mapper._
 
 import code.model._
 import xml.NodeSeq
+import reactive.web.Reactions
 
 
 /**
@@ -103,6 +104,9 @@ class Boot {
 
     // Make a transaction span the whole HTTP request
     S.addAround(DB.buildLoanWrapper)
+
+    // Reactive Web
+    Reactions.init(true)
   }
 
   def example: NodeSeq => NodeSeq = (for {

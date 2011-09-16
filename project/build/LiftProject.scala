@@ -1,19 +1,22 @@
 import sbt._
 
 class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
-  val liftVersion = "2.4-M4"
+  val liftVersion = "2.4-SNAPSHOT"
 
   // uncomment the following if you want to use the snapshot repo
-  //  val scalatoolsSnapshot = ScalaToolsSnapshots
+  val scalatoolsSnapshot = ScalaToolsSnapshots
 
   // If you're using JRebel for Lift development, uncomment
   // this line
   // override def scanDirectories = Nil
 
+  val sonatype_snapshot = "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
+
   override def libraryDependencies = Set(
     "net.liftweb" %% "lift-webkit" % liftVersion % "compile",
     "net.liftweb" %% "lift-mapper" % liftVersion % "compile",
     "net.liftweb" %% "lift-wizard" % liftVersion % "compile",
+    "cc.co.scala-reactive" %% "reactive-web" % "0.2-SNAPSHOT" % "compile",
     "org.mortbay.jetty" % "jetty" % "6.1.22" % "test",
     "junit" % "junit" % "4.5" % "test",
     "ch.qos.logback" % "logback-classic" % "0.9.26",
