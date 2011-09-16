@@ -14,27 +14,28 @@ import Helpers._
 import lib._
 
 
-class HelloWorldTestSpecsAsTest extends JUnit4(HelloWorldTestSpecs)
-object HelloWorldTestSpecsRunner extends ConsoleRunner(HelloWorldTestSpecs)
+//class HelloWorldTestSpecsAsTest extends JUnit4(HelloWorldTestSpecs)
+//object HelloWorldTestSpecsRunner extends ConsoleRunner(HelloWorldTestSpecs)
 
 object HelloWorldTestSpecs extends Specification {
   val session = new LiftSession("", randomString(20), Empty)
   val stableTime = now
 
   val req: Req = Req.nil.withNewPath(ParsePath("foo" :: "bar" :: Nil,
-  "", true, false)) // Req()
+  "", true, false)) 
 
   override def executeExpectations(ex: Examples, t: =>Any): Any = {
-    println("Hey... we're in execute ******")
-    // S.init(req, session) {
-    S.initIfUninitted(session) {
+    S.init(req, session) {
       DependencyFactory.time.doWith(stableTime) {
         super.executeExpectations(ex, t)
       }
     }
   }
 
+
   "HelloWorld Snippet" should {
+    setSequential()
+
     "Put the time in the node" in {
       val hello = new HelloWorld
       Thread.sleep(1000) // make sure the time changes
@@ -45,18 +46,10 @@ object HelloWorldTestSpecs extends Specification {
       str.indexOf("Welcome to") must be >= 0
     }
 
-
-
-  }
-
-  "Testing expectations" should {
         "Has expected path" in {
-      /*S.request.
+      S.request.
         map(_.path.partPath.mkString("/",
         "/", "")).open_! must_== "/foo/bar"
-        */
-
-      "foo" must_== "foo"
     }
   }
 }

@@ -29,7 +29,7 @@ import Helpers._
 import java.net.{URL, InetAddress}
 import scala.Option._
 
-object TestingThingSpec extends Specification with RequestKit {
+class TestingThingSpec extends Specification with RequestKit {
 
   private def reachableLocalAddress = {
     val l = InetAddress.getLocalHost
