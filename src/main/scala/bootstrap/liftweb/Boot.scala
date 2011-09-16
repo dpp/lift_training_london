@@ -23,11 +23,11 @@ import reactive.web.Reactions
 class Boot {
   def boot {
     if (!DB.jndiJdbcConnAvailable_?) {
-      val vendor = 
-	new StandardDBVendor(Props.get("db.driver") openOr "org.h2.Driver",
-			     Props.get("db.url") openOr 
-			     "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE",
-			     Props.get("db.user"), Props.get("db.password"))
+      val vendor =
+        new StandardDBVendor(Props.get("db.driver") openOr "org.h2.Driver",
+          Props.get("db.url") openOr
+            "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE",
+          Props.get("db.user"), Props.get("db.password"))
 
       LiftRules.unloadHooks.append(() => vendor.closeAllConnections_!())
 
@@ -47,11 +47,13 @@ class Boot {
       Menu.i("Home") / "index" >> User.AddUserMenusAfter, // the simple way to declare a menu
 
       Menu.i("Sometimes") / "sometimes" >> If(shouldDisplay _,
-                                              S ? "Can't view now"),
+        S ? "Can't view now"),
 
-    Menu.i("Form") / "form",
+      Menu.i("Reactive") / "reactive",
 
-      Menu.i("top") / "top" submenus(
+      Menu.i("Form") / "form",
+
+      Menu.i("top") / "top" submenus (
         Menu.i("About") / "about" >> Hidden >> LocGroup("bottom"),
         Menu.i("Contact") / "contact"
         ),
@@ -63,7 +65,7 @@ class Boot {
         case "who" => Full(Both)
         case _ => Empty
       }, w => w.showString) / "what" >> If(() => true, "huh") >>
-      Value(First),
+        Value(First),
 
       // more complex because this menu allows anything in the
       // /static path to be visible
@@ -78,7 +80,7 @@ class Boot {
     //Show the spinny image when an Ajax call starts
     LiftRules.ajaxStart =
       Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
-    
+
     // Make the spinny image go away when it ends
     LiftRules.ajaxEnd =
       Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)
@@ -107,6 +109,8 @@ class Boot {
 
     // Reactive Web
     Reactions.init(true)
+
+    LiftRules.dispatch.append(CVServer)
   }
 
   def example: NodeSeq => NodeSeq = (for {
@@ -119,12 +123,30 @@ class Boot {
 sealed trait What {
   def showString: String
 }
+
 case object First extends What {
   def showString: String = "one"
 }
+
 case object Second extends What {
   def showString: String = "two"
 }
-case object Both extends What  {
+
+case object Both extends What {
   def showString: String = "both"
+}
+
+import rest._
+
+object CVServer extends RestHelper {
+  object MyVar extends SessionVar(45)
+  object MyVar2 extends SessionVar("")
+
+  serve {
+    case "cv_int" :: param Get _ =>
+      param.flatMap(v => Helpers.asInt(v).toList).foreach(MyVar.set _)
+    <int>{MyVar.get.toString}</int>
+    case "cv_str" :: param Get _ => param.foreach(MyVar2.set _)
+    <str>{MyVar2.get}</str>
+  }
 }

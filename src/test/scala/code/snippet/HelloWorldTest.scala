@@ -21,7 +21,12 @@ object HelloWorldTestSpecs extends Specification {
   val session = new LiftSession("", randomString(20), Empty)
   val stableTime = now
 
+  val req: Req = Req.nil.withNewPath(ParsePath("foo" :: "bar" :: Nil,
+  "", true, false)) // Req()
+
   override def executeExpectations(ex: Examples, t: =>Any): Any = {
+    println("Hey... we're in execute ******")
+    // S.init(req, session) {
     S.initIfUninitted(session) {
       DependencyFactory.time.doWith(stableTime) {
         super.executeExpectations(ex, t)
@@ -37,7 +42,21 @@ object HelloWorldTestSpecs extends Specification {
       val str = hello.howdy(<span>Welcome to your Lift app at <span id="time">Time goes here</span></span>).toString
 
       str.indexOf(stableTime.toString) must be >= 0
-      str.indexOf("Hello at") must be >= 0
+      str.indexOf("Welcome to") must be >= 0
+    }
+
+
+
+  }
+
+  "Testing expectations" should {
+        "Has expected path" in {
+      /*S.request.
+        map(_.path.partPath.mkString("/",
+        "/", "")).open_! must_== "/foo/bar"
+        */
+
+      "foo" must_== "foo"
     }
   }
 }
