@@ -23,7 +23,8 @@ class SimpleScreen extends Wizard {
   }
 
   val screen2 = new Screen {
-    val mothersName = field("Mother's name", "")
+    val whenClause = mothersAge.lift(_ > 50)
+    val mothersName: Field[Box[String]] = optional(field("Mother's name", "")) when (whenClause)
     val mothersAge = field("Mother's age", 0,
       minVal(screen1.age.get + 10, "Mother too young"))
 
